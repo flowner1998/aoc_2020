@@ -29,7 +29,8 @@ function defineSeat($seat){
 
     return array(
         "row" => $row[0],
-        "column" => $column[0]
+        "column" => $column[0],
+        "id" => defineId($row[0], $column[0])
     );
 
 }
@@ -43,15 +44,45 @@ function spacePartition($workArray, $char){
     return $workArray;
 }
 
-function defineId($seat){
-    return $seat['row'] * 8 + $seat['column'];
+function defineId($row, $column){
+    return $row * 8 + $column;
+}
+
+function writeSeats($realSeats){
+    $filepath = "./day_5/outfile.txt";
+    $workfile = fopen($filepath, 'w') or die;
+
+    foreach ($realSeats as $i => $seat) {
+        fwrite($workfile,
+            "Row: {$seat['row']}, Column: {$seat['column']}, Id: {$seat['id']}\n"
+        );
+    }
+    fclose($workfile);
+}
+
+function stepSeats($realSeats){
+    $lastId = 0;
+    foreach ($realSeats as $seat) {
+        if($seat['id'] - $lastId > 1){
+            print($seat['id'] . PHP_EOL);
+        }
+        $lastId = $seat['id'];
+    }
 }
 
 $seats = ingest();
-$seatIds = array();
+$realSeats = array();
 foreach ($seats as $seat) {
-    $seat = defineSeat($seat);
-    $seatIds[] = defineId($seat);
+    $realSeats[] = defineSeat($seat);
 }
 
-print(max($seatIds) . PHP_EOL);
+$ids = array();
+foreach ($realSeats as $i => $seat) {
+    $ids[$i] = $seat['id'];
+}
+
+array_multisort($ids, SORT_ASC, $realSeats);
+
+writeSeats($realSeats);
+
+stepSeats($realSeats);

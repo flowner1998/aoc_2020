@@ -66,25 +66,6 @@ function main($right, $down){
     return $trees;
 }
 
-/**
- * Make a visual representation of the path.
- * 
- * @param array $map The current mapping
- * @return void
- */
-function write_map($map){
-    $filepath = "./day_3/outfile.txt";
-    $workfile = fopen($filepath, 'w') or die;
-
-    foreach ($map as $line) {
-        foreach ($line as $spot) {
-            fwrite($workfile, $spot);
-        }
-        fwrite($workfile, "\n");
-    }
-    fclose($workfile);
-}
-
 $answer = main(1,1) * main(3,1) * main(5,1) * main(7,1) * main(1,2);
 echo("Answer: " . $answer);
 echo("\n");
