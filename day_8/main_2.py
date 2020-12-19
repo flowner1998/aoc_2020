@@ -1,0 +1,101 @@
+def ingest():
+    instructions = list()
+    with open("./day_8/input.txt", 'r') as wf:
+        for line in wf.readlines():
+            line = line.strip()
+            splits = line.split()
+            instruction = {
+                'operation': splits[0],
+                'argument': splits[1]
+            }
+            instructions.append(instruction)
+    return instructions
+
+def executeInstruction(instruction, step, accumelator):
+    operation = instruction['operation']
+    argument = instruction['argument']
+
+    if(operation == 'acc'):
+        accumelator = accumelate(argument, accumelator)
+        step+=1
+        return (step, accumelator)
+
+    elif(operation == 'jmp'):
+        step = jump(argument, step)
+        return (step, accumelator)
+
+    elif(operation == 'nop'):
+        step+=1
+        return (step, accumelator)
+    else:
+        print("ERROR")
+        exit()
+        
+        
+
+def accumelate(argument, accumelator):
+    operator = argument[0]
+    amount = int(argument[1:])
+    if(operator == '+'):
+        accumelator += amount
+        return accumelator
+    elif(operator == '-'):
+        accumelator -= amount
+        return accumelator
+    else:
+        print("ERROR")
+        exit()
+
+def jump(argument, step):
+    operator = argument[0]
+    amount = int(argument[1:])
+    if(operator == '+'):
+        step += amount
+        return step
+    elif(operator == '-'):
+        step -= amount
+        return step
+    else:
+        print("ERROR")
+        exit()
+
+def solve(instructions):
+    step = 0
+    accumelator = 0
+    alreadyExecuted = set()
+    while(step < len(instructions)):
+        if(step in alreadyExecuted):
+            return (False, accumelator)
+        alreadyExecuted.add(step)
+        step, accumelator = executeInstruction(instructions[step], step, accumelator)
+    return (True, accumelator)
+
+def swapInstruction(instructions, step):
+    if(instructions[step]['operation'] == 'jmp'):
+        instructions[step]['operation'] = "nop"
+    elif(instructions[step]['operation'] == 'nop'):
+        instructions[step]['operation'] = "jmp"
+    else:
+        return (False, instructions)
+    return (True, instructions)
+
+def main():
+    changeInstruction = 0
+    while(True):
+        instructions = ingest()
+        
+        swapped, instructions = swapInstruction(instructions, changeInstruction)
+        if(swapped):
+            solved, accumelator = solve(instructions)
+        else:
+            changeInstruction += 1
+            continue
+        if(solved):
+            print("Solved by switching line: " + str(changeInstruction + 1))
+            print("accumelator is: " + str(accumelator))
+            break
+        else:
+            changeInstruction += 1
+
+
+main()
