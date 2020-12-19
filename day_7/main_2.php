@@ -43,14 +43,13 @@ function calculateContent($bags, $currentBag){
     $total = 0;
     if(count($bags[$currentBag]) > 0){
         foreach ($bags[$currentBag] as $bagtype => $amount) {
-            
-            $total += $amount * calculateContent($bags, $bagtype);
+            $total += $amount * calculateContent($bags, $bagtype) + 1;
         }
         
     }else{
         return 1;
     }
-    return $total + 1;
+    return $total;
 }
 
 $bags = ingest();

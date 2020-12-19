@@ -40,7 +40,6 @@ function defineBag(string $line){
 }
 
 function canContain($allBags, $bag, $search){
-    $depth = 0;
     foreach ($bag as $key => $value) {
         if($key === $search){
             return true;
