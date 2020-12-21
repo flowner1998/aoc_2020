@@ -1,3 +1,4 @@
+const { count } = require('console');
 const fs = require('fs');
 
 class Spot{
@@ -59,7 +60,7 @@ class Spot{
 }
 
 function ingest(){
-    const filePath = "./day_11/test_input.txt";
+    const filePath = "./day_11/input.txt";
     try {
         const data = fs.readFileSync(filePath, 'utf8');
         const lines = data.split("\r\n");
@@ -115,12 +116,12 @@ function defineLayout(layout){
     return ferry;
 }
 
-function printHistory(){
-    for (const ferry of history) {
-        toPrint = "";
-        for (const row of ferry) {
+function printHistory(history){
+    for (const layout of history) {
+        let toPrint = "";
+        for (const row of layout) {
             for(spot of row){
-                toPrint += spot.self;
+                toPrint += spot;
             }
             toPrint += "\n";
         }
@@ -128,27 +129,49 @@ function printHistory(){
     }
 }
 
+function countOccupiedSeats(layout){
+    let c = 0;
+    for(const row of layout){
+        for(const spot of row){
+            if(spot === "#"){
+                c++;
+            }
+        }
+    }
+    return c;
+}
+
 function main(){
     let layout = ingest();
     let ferry = defineLayout(layout);
 
-    history = Array()
-    history.push(ferry);
+    let history = Array()
+    history.push(layout);
 
-    seatsChanged = 1;
+    let answer = 0;
+
+    let seatsChanged = 1;
     while(seatsChanged){
         seatsChanged = 0;
+        let newLayout = Array();
         for (let y = 0; y < ferry.length; y++) {
+            let newRow = Array();
             for (let x = 0; x < ferry[y].length; x++) {
                 if(ferry[y][x].doRun()){seatsChanged++;}
-            }   
+                newRow.push(ferry[y][x].self);
+            }
+            newLayout.push(newRow);
         }
+        history.push(newLayout);
+        ferry = defineLayout(newLayout);
 
-        history.push(ferry)
+        if(seatsChanged === 0){
+            answer = countOccupiedSeats(newLayout);
+        }
     }
 
     printHistory(history);
+    console.log("Answer: ", answer);
 }
-
 
 main()
