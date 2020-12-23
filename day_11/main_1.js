@@ -4,37 +4,29 @@ const fs = require('fs');
 class Spot{
 
     self = "nothing"
-    north = "nothing";
-    east = "nothing";
-    south = "nothing";
-    west = "nothing"
-    northeast = "nothing";
-    southeast = "nothing";
-    southwest = "nothing";
-    northwest = "nothing";
-    constructor(self, n, e, s, w, ne, se, sw, nw){
+    directions = Array(8);
+    // Directions consist of
+    // 0: North
+    // 1: North-East
+    // 2: East
+    // 3: South-East
+    // 4: South
+    // 5: Sout-West
+    // 6: West
+    // 7: North-west
+
+    constructor(self, directions){
         this.self = self;
-        this.north = n;
-        this.east = e;
-        this.south = s;
-        this.west = w;
-        this.northeast = ne;
-        this.southeast = se;
-        this.southwest = sw;
-        this.northwest = nw;
-        
+        this.directions = directions;
     }
 
     countNearbyOccupied(){
         let count = 0;
-        if(this.north === "#"){count++;}
-        if(this.east === "#"){count++;}
-        if(this.south === "#"){count++}
-        if(this.west === "#"){count++}
-        if(this.northeast=== "#"){count++}
-        if(this.southeast === "#"){count++}
-        if(this.southwest === "#"){count++}
-        if(this.northwest === "#"){count++}
+        for(const d of this.directions){
+            if(d === "#"){
+                count++
+            }
+        }
         return count;
     }
 
@@ -74,40 +66,67 @@ function ingest(){
     }   
 }
 
+function getDirections(layout, y, x, direction){
+    vY = vX = 0;
+    switch (direction) {
+        case 0:
+            // North
+            vY = -1;
+            break;
+        case 1:
+            // North-East
+            vY = -1; vX = 1
+            break;
+        case 2:
+            // East
+            vX = 1;
+            break;
+        case 3:
+            // South-East
+            vY = 1; vX = 1;
+            break;
+        case 4:
+            // South
+            vY = 1;
+            break;
+        case 5:
+            // South-West
+            vY = 1; vX = -1;
+            break;
+        case 6:
+            // West
+            vX = -1;
+            break
+        case 7:
+            // North West
+            vY = -1; vX = -1;
+            break;
+        default:
+            break;
+    }
+    if(layout[y + vY]){
+        if(layout[y + vY][x + vX]){
+            return layout[y + vY][x + vX];
+        }else{
+            return "nothing";
+        }
+    }else{
+        return "nothing";
+    }
+}
+
 function defineLayout(layout){
     let ferry = new Array;
     for (let y = 0; y < layout.length; y++) {
         let row = new Array();
         for (let x = 0; x < layout[y].length; x++) {
-            let n, e, s, w, ne, se, sw, nw;
-            if(layout[y-1]){
-                n = layout[y-1][x];
-                if(layout[y-1][x-1]){ nw = layout[y-1][x-1] } else { nw = "nothing" }
-                if(layout[y-1][x+1]){ ne = layout[y-1][x+1] } else { ne = "nothing" }
-            }else{
-                n = ne = nw = "nothing";
+            let directions = Array(8);
+            for(let i = 0; i < 8; i++){
+                directions[i] = getDirections(layout, y, x, i);
             }
-            if(layout[y][x+1]){
-                e = layout[y][x+1];
-            }else{
-                e = "nothing";
-            }
-            if(layout[y+1]){
-                s = layout[y+1][x];
-                if(layout[y+1][x-1]){ sw = layout[y+1][x-1] } else { sw = "nothing" }
-                if(layout[y+1][x+1]){ se = layout[y+1][x+1] } else { se = "nothing" }
-            }else{
-                s = se = sw = "nothing";
-            }
-            if(layout[y][x-1]){
-                w = layout[y][x-1];
-            }else{
-                w = "nothing";
-            }
-
             let spot = new Spot(
                 layout[y][x],
-                n, e, s, w, ne, se, sw, nw
+                directions
             );
             row.push(spot);
         }

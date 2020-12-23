@@ -22,7 +22,7 @@ class Spot{
 
     countNearbyOccupied(){
         let count = 0;
-        for(const d of this.directions){
+        for(let d of this.directions){
             if(d === "#"){
                 count++
             }
@@ -40,7 +40,7 @@ class Spot{
                 }
             }
 
-            if(occupied > 3){
+            if(occupied > 4){
                 if(this.self === "#"){
                     this.self = "L";
                     return true;
@@ -66,7 +66,8 @@ function ingest(){
     }   
 }
 
-function getDirections(layout, y, x, direction){
+function getFirstInDirection(layout, y, x, direction){
+    let vX, vY;
     vY = vX = 0;
     switch (direction) {
         case 0:
@@ -106,7 +107,15 @@ function getDirections(layout, y, x, direction){
     }
     if(layout[y + vY]){
         if(layout[y + vY][x + vX]){
-            return layout[y + vY][x + vX];
+            if(layout[y + vY][x + vX] === "."){
+                return getFirstInDirection(layout, y+vY, x+vX, direction);
+            }else if(layout[y + vY][x + vX] === "L"){
+                return "L";
+            }else if(layout[y + vY][x + vX] === "#"){
+                return "#"
+            }else{
+                return "nothing";
+            }
         }else{
             return "nothing";
         }
@@ -116,13 +125,13 @@ function getDirections(layout, y, x, direction){
 }
 
 function defineLayout(layout){
-    let ferry = new Array;
+    let ferry = new Array();
     for (let y = 0; y < layout.length; y++) {
         let row = new Array();
         for (let x = 0; x < layout[y].length; x++) {
-            let directions = Array(8);
-            for(const i = 0; i < 8; i++){
-                directions[i] = getDirections(layout, y, x, i);
+            let directions = new Array(8);
+            for(let i = 0; i < 8; i++){
+                directions[i] = getFirstInDirection(layout, y, x, i);
             }
             let spot = new Spot(
                 layout[y][x],
